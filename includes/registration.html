@@ -2,19 +2,24 @@
     <div class="hero-bg">
       <img src="assets/img/Picture1.jpg" alt="">
     </div>
-        <div class="container-fluid loginouter">
-            <div class="card bg-light mb-3">
-                <div class="card-body">
-    <form action="check_registration.php" method="POST">
-        Registration username:<br>
-        <input type="text" name="username"><br>
-        Registration password:<br>
-        <input type="password" name="pass"><br><br>
-        <input type="submit" class="btn btn-outline-primary" value="Submit">
-    </form>
-</div>
-</div>
-    </div> <!-- end of <div class="container-left"> -->
-</div>
 
-</section><!-- /Hero Section -->
+    <div class="container-fluid loginouter">
+        <div class="card bg-light mb-3">
+            <div class="card-body">
+
+                <form action="{% url 'check_registration' %}" method="POST">
+                    {% csrf_token %}
+
+                    <label>Registration username:</label><br>
+                    <input type="text" name="username"><br>
+
+                    <label>Registration password:</label><br>
+                    <input type="password" name="pass"><br><br>
+
+                    <input type="submit" class="btn btn-outline-primary" value="Submit">
+                </form>
+
+            </div>
+        </div>
+    </div>
+</section>

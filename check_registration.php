@@ -11,10 +11,16 @@ if (isset($_SESSION['username'])) {
     exit();
 }
 
+// --- CSRF CHECK ---
+if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_token']) {
+    die("CSRF validation failed.");
+}
+// -------------------
+
 $username = $_POST['username'] ?? '';
 $password = $_POST['pass'] ?? '';
 
-// Vérification si l'utilisateur existe (requête préparée)
+// Vérification si l'utilisateur existe
 $stmt1 = $connection->prepare(
     "SELECT users_username FROM users WHERE users_username = ? AND users_password = ?"
 );
@@ -24,7 +30,7 @@ $stmt1->store_result();
 
 if ($stmt1->num_rows === 0) {
 
-    // Inscription : requête préparée sécurisée
+    // Inscription
     $stmt2 = $connection->prepare(
         "INSERT INTO users (users_username, users_password) VALUES (?, ?)"
     );
