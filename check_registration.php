@@ -17,10 +17,15 @@ if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_tok
 }
 // -------------------
 
-$username = $_POST['username'] ?? '';
-$password = $_POST['pass'] ?? '';
+// 🛡️ Filtrage & validation
+$username = trim($_POST['username'] ?? '');
+$password = trim($_POST['pass'] ?? '');
 
-if (empty($username) || empty($password)) {
+// Anti-XSS dans les données stockées
+$username = htmlspecialchars($username, ENT_QUOTES, 'UTF-8');
+
+// Vérification vide
+if ($username === '' || $password === '') {
     die("Invalid form submission.");
 }
 
@@ -34,7 +39,7 @@ $stmt1->store_result();
 
 if ($stmt1->num_rows === 0) {
 
-    // Insertion utilisateur
+    // Insertion utilisateur (SANS hash, comme demandé)
     $stmt2 = $connection->prepare(
         "INSERT INTO users (users_username, users_password) VALUES (?, ?)"
     );

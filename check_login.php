@@ -16,12 +16,20 @@ if (isset($_SESSION['username'])) {
     exit();
 }
 
-$username = $_POST['username'] ?? '';
-$password = $_POST['pass'] ?? '';
+// 🛡️ Filtrage & nettoyage
+$username = trim($_POST['username'] ?? '');
+$password = trim($_POST['pass'] ?? '');
 
-// Requête préparée sécurisée
+if ($username === '' || $password === '') {
+    die("Invalid form submission.");
+}
+
+// Anti-XSS dans les données affichées
+$username_safe = htmlspecialchars($username, ENT_QUOTES, 'UTF-8');
+
+// Récupération utilisateur avec vérification password (en clair)
 $stmt = $connection->prepare(
-    "SELECT users_username, users_password 
+    "SELECT users_username 
      FROM users 
      WHERE users_username = ? AND users_password = ?"
 );
@@ -30,15 +38,19 @@ $stmt->execute();
 
 $result = $stmt->get_result();
 
-if ($result && $result->num_rows > 0) {
+if ($result && $result->num_rows === 1) {
 
-    while ($row = $result->fetch_assoc()) {
-        $_SESSION['username'] = $row['users_username'];
-        include 'includes/navbar.html';
-        include 'includes/logged.php';
-    }
+    $row = $result->fetch_assoc();
+
+    // Login OK
+    $_SESSION['username'] = $row['users_username'];
+
+    include 'includes/navbar.html';
+    include 'includes/logged.php';
 
 } else {
+
+    // Login incorrect
     include 'includes/navbar.html';
     include 'includes/notlogged.php';
 }
