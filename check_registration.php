@@ -20,17 +20,21 @@ if (!isset($_POST['csrf_token']) || $_POST['csrf_token'] !== $_SESSION['csrf_tok
 $username = $_POST['username'] ?? '';
 $password = $_POST['pass'] ?? '';
 
+if (empty($username) || empty($password)) {
+    die("Invalid form submission.");
+}
+
 // Vérification si l'utilisateur existe
 $stmt1 = $connection->prepare(
-    "SELECT users_username FROM users WHERE users_username = ? AND users_password = ?"
+    "SELECT users_username FROM users WHERE users_username = ?"
 );
-$stmt1->bind_param("ss", $username, $password);
+$stmt1->bind_param("s", $username);
 $stmt1->execute();
 $stmt1->store_result();
 
 if ($stmt1->num_rows === 0) {
 
-    // Inscription
+    // Insertion utilisateur
     $stmt2 = $connection->prepare(
         "INSERT INTO users (users_username, users_password) VALUES (?, ?)"
     );

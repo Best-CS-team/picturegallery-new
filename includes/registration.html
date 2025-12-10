@@ -1,3 +1,10 @@
+<?php
+// Générer un token CSRF si absent
+if (empty($_SESSION['csrf_token'])) {
+    $_SESSION['csrf_token'] = bin2hex(random_bytes(32));
+}
+?>
+
 <section id="hero" class="hero section">
     <div class="hero-bg">
       <img src="assets/img/Picture1.jpg" alt="">
@@ -7,14 +14,16 @@
         <div class="card bg-light mb-3">
             <div class="card-body">
 
-                <form action="{% url 'check_registration' %}" method="POST">
-                    {% csrf_token %}
+                <form action="check_registration.php" method="POST">
+                    
+                    <!-- CSRF TOKEN -->
+                    <input type="hidden" name="csrf_token" value="<?php echo $_SESSION['csrf_token']; ?>">
 
                     <label>Registration username:</label><br>
-                    <input type="text" name="username"><br>
+                    <input type="text" name="username" required><br>
 
                     <label>Registration password:</label><br>
-                    <input type="password" name="pass"><br><br>
+                    <input type="password" name="pass" required><br><br>
 
                     <input type="submit" class="btn btn-outline-primary" value="Submit">
                 </form>
